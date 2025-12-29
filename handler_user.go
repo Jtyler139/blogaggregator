@@ -56,6 +56,15 @@ func handlerLogin(s *state, cmd command) error {
 	return nil
 }
 
+func handlerReset(s *state, cmd command) error {
+	err := s.db.Reset(context.Background())
+	if err != nil {
+		return fmt.Errorf("couldn't reset database: %w", err)
+	}
+	fmt.Println("all users deleted from database")
+	return nil
+}
+
 func printUser(user database.User) {
 	fmt.Printf(" * ID:      %v\n", user.ID)
 	fmt.Printf(" * Name:    %v\n", user.Name)
