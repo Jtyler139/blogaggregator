@@ -1,13 +1,13 @@
 package main
 
-import _ "github.com/lib/pq"
-
 import (
-	"github.com/jtyler139/blogaggregator/internal/config"
-	"os"
-	"log"
 	"database/sql"
+	"log"
+	"os"
+	
+	"github.com/jtyler139/blogaggregator/internal/config"
 	"github.com/jtyler139/blogaggregator/internal/database"
+	_ "github.com/lib/pq"
 )
 
 type state struct {
@@ -16,22 +16,20 @@ type state struct {
 }
 
 func main() {
-	dbURL := "postgres://postgres:postgres@localhost:5432/gator"
-
-	db, err := sql.Open("postgres", dbURL)
-	if err != nil {
-		log.Fatalf("error opening database: %v", err)
-	}
-
-	dbQueries := database.New(db)
-
 	cfg, err := config.Read()
 	if err != nil {
 		log.Fatalf("error reading config: %v", err)
 	}
-	
+
+	db, err := sql.Open("postgres", cfg.DBURL)
+	if err != nil {
+		log.Fatalf("error connecting to db: %v", err)
+	}
+	defer db.Close()
+	dbQueries := database.New(db)
+
 	programState := &state{
-		db: dbQueries,
+		db:	 dbQueries,
 		cfg: &cfg,
 	}
 
